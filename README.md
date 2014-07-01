@@ -48,6 +48,7 @@ Then, your actual `page_layout.css.scss` file, where the styling should take pla
 
 With this pattern we infrequently add new Descriptive Name variables and very frequently add Functional Name variables, allowing us to make massive color changes to the site by only ever editing one file, the `_vars.css.scss` file.
 
+
 ## Declarative Order for CSS
 
 Each CSS block must follow this order:
@@ -61,7 +62,6 @@ Each CSS block must follow this order:
   8. Everything else
 
 For example:
-
 ```SCSS
 .section {
   @include box-sizing(border-box);
@@ -115,9 +115,10 @@ Filenames must utilize underscores, not dashes
   - __Wrong:__ `my-excellent-module.js`
 
 ### JavaScript Modules
-JavaScript modules should be named (in camelCase) according to their functionality, and their filenames (in snake_case) should match:
+JavaScript modules should be named (in camelCase) according to their functionality, and their filenames (in snake_case) should match.
 
-This function:
+For example, the function...
+
 ```JavaScript
 WEBLINC.myExcellentModule = (function () {
     'use strict';
@@ -135,6 +136,16 @@ WEBLINC.myExcellentModule = (function () {
 ```
 
 ... should be named `my_excellent_module.js`
+
+
+## Overriding Views (Engines Base Feature)
+
+### When to Commit
+When ever you run the ```bundle exec weblinc override``` command to pull a asset from any remote engine repository into your local repository, you _must_ commit immediately _after_ the override, and _before_ you begin to adjust the file.
+
+Furthermore, your commit message for the override should be phrased much like "Overrides Product Detail Clothing Template", or something to the effect, having "Overrides" as the first word in the commit message.
+
+This allows a reviewer to clearly see which commits are for overrides and which are for actual work needing review. The difference being that overridden files need no review, since they have been reviewed and accepted previously. If the commits are not separated the reviewer can easily assume that the developer had written the entire file from scratch.
 
 
 ## Style Guide
