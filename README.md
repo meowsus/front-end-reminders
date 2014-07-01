@@ -1,6 +1,6 @@
 # Work Blunders
 
-A Living Document Cataloging Frequently Made Front-end Blunders at Work
+A Living Document Cataloging Frequently Made Front-end Mistakes at Work
 
 ## Color Variables: Descriptive vs. Functional
 
