@@ -1,4 +1,4 @@
-# Work Blunders
+# Front-end Reminders
 
 A Living Document Cataloging Frequently Made Front-end Mistakes at Work
 
