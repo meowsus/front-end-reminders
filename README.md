@@ -31,6 +31,62 @@ More info on less than straightforward selectors:
   - [Adjacent sibling selectors on MDN](https://developer.mozilla.org/en-US/docs/Web/CSS/Adjacent_sibling_selectors)
   - [General sibling selectors on MDN](https://developer.mozilla.org/en-US/docs/Web/CSS/General_sibling_selectors)
 
+
+## Applying Z-Indexes in CSS
+
+### Do you need it?
+`z-index`es should only be applied when they need to be. Keep in mind that the order that you declare your elements in a block of markup also dictates implicit element stacking rules. Consider this styling:
+
+```SCSS
+.example > p {
+  display: block;
+  position: relative;
+  top: -20px;
+  width: 100%;
+  height: 20px;
+  background-color: $red;
+}
+```
+
+As it's applied to the following markup:
+
+```HAML
+.example
+  %p One
+  %p Two
+  %p Three
+  %p Four
+  %p Five
+```
+
+Only one block would appear, and that block would read "Five".
+
+This is because each element in markup is naturally considered "above" the element that precedes it. So, naturally, the last sibling, when positioned above it's other siblings, will be in the forefront.
+
+Keep this in mind before using `z-index`.
+
+
+### Useful commenting
+It's safe to assume that every time you add a `z-index` property to a style block, it's purposeful. You want that element to appear over another element and/or under another.
+
+This is why we should always indicate this with a comment following the application of this property, for example:
+
+```SCSS
+.wl-page-header {
+  @extend %cf;
+  position: relative;
+  z-index: 30; // over wl-page-content and wl-page-footer
+  margin: 0 0 15px;
+  background: $background-color;
+
+  ...
+
+}
+```
+
+In this block, any other developer can clearly see the intent: you want `.wl-page-header` to appear overtop both `.wl-page-content` and`.wl-page-footer`.
+
+
 ## Color Variables: Descriptive vs. Functional
 
 When adding a new color to be used across the site, we add it to the top of `_vars.css.scss`, inside the _Descriptive Names_ section, like so:
