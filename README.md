@@ -2,6 +2,35 @@
 
 A Living Document Cataloging Frequently Made Front-end Mistakes at Work
 
+## Adjacent Selectors in CSS
+This type of pattern is frequently seen:
+```SCSS
+.wl-product-list {
+  .product-list-item {
+    // Each item gets a top border
+    border-top: 1px dotted $border-color;
+    &:first-child {
+      // Except the first
+      border-top: 0;
+    }
+  }
+}
+```
+
+A more sustainable way to write this would be:
+```SCSS
+.wl-product-list {
+  .product-list-item + .product-list-item {
+    // Each item gets a top border, except the first
+    border-top: 1px dotted $border-color;
+  }
+}
+```
+
+More info on less than straightforward selectors:
+  - [Adjacent sibling selectors on MDN](https://developer.mozilla.org/en-US/docs/Web/CSS/Adjacent_sibling_selectors)
+  - [General sibling selectors on MDN](https://developer.mozilla.org/en-US/docs/Web/CSS/General_sibling_selectors)
+
 ## Color Variables: Descriptive vs. Functional
 
 When adding a new color to be used across the site, we add it to the top of `_vars.css.scss`, inside the _Descriptive Names_ section, like so:
