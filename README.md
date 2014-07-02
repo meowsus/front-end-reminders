@@ -111,7 +111,7 @@ This is important not only for readability, for both developers, screen readers,
 
 ## Class or ID declarations in HAML
 
-HAML is smart. By default, without explicitly specifying an element via HAML's class (the dot '.') and/or ID (the octothorpe, or hash '#') syntax only, HAML assumes you want to use a div, like so:
+HAML is smart. By default, without explicitly specifying an element via HAML's class (the dot '.') and/or ID (the octothorpe, or hash '#') syntax only, HAML assumes you want to use `div`, like so:
 
 ```HAML
 #my-id.my-class
@@ -126,7 +126,7 @@ compiles to:
 </div>
 ```
 
-If you don't want a div, you can explicitly tell HAML what kind of element you want:
+If you don't want a `div`, you can explicitly tell HAML what kind of element you want:
 
 ```HAML
 %span.wl-icon--share
@@ -138,7 +138,7 @@ which would compile to
 <span class="wl-icon--share"></span>
 ```
 
-_This is the appropriate way to define classes that don't need to be dynamic in nature._
+__*This is the appropriate way to define classes that don't need to be dynamic in nature.*__
 
 If you do need your class applied to an element, based on a condition, use the following notation:
 
