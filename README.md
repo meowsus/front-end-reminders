@@ -212,7 +212,7 @@ With this pattern we infrequently add new Descriptive Name variables and very fr
 ## Declarative Order for CSS
 
 Each CSS block must follow this order:
-  1. Extending + Including (except for respond-to)
+  1. Extending + Including (but not respond-to)
   2. Display + Positioning
   3. Margins + Padding
   4. Width + Height
@@ -220,6 +220,7 @@ Each CSS block must follow this order:
   6. Font Styling
   7. Backgrounds + Borders
   8. Everything else
+  9. @include respond-to();
 
 A contrived example:
 ```SCSS
