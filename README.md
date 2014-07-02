@@ -109,6 +109,58 @@ This is important not only for readability, for both developers, screen readers,
 
 
 
+## Class or ID declarations in HAML
+
+HAML is smart. By default, without explicitly specifying an element via HAML's class (the dot '.') and/or ID (the octothorpe, or hash '#') syntax only, HAML assumes you want to use a div, like so:
+
+```HAML
+#my-id.my-class
+  Hey There
+```
+
+compiles to:
+
+```HTML
+<div id="my-id" class="my-class">
+    Hey There
+</div>
+```
+
+If you don't want a div, you can explicitly tell HAML what kind of element you want:
+
+```HAML
+%span.wl-icon--share
+```
+
+which would compile to
+
+```HTML
+<span class="wl-icon--share"></span>
+```
+
+_This is the appropriate way to define classes that don't need to be dynamic in nature._
+
+If you do need your class applied to an element, based on a condition, use the following notation:
+
+```HAML
+%span.wl-icon{ class: 'wl-icon--share' if @product.share_enabled? }
+```
+
+which would compile to
+
+```HTML
+<span class="wl-icon"></span>
+```
+
+if, in this example, the product does not have sharing enabled, and:
+
+```HTML
+<span class="wl-icon wl-icon--share"></span>
+```
+
+if it does.
+
+
 ## Color Variables: Descriptive vs. Functional
 
 When adding a new color to be used across the site, we add it to the top of `_vars.css.scss`, inside the _Descriptive Names_ section, like so:
@@ -266,6 +318,8 @@ but this opens room for more merge conflicts. Since all of our SCSS is compiled 
   font-weight: bold;
 }
 ```
+
+If every block adheres to this rule, git is able to resolve many more conflicts by itself and better understand what developers are trying to do with each SCSS commit.
 
 
 
