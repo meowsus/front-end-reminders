@@ -1,4 +1,4 @@
-# Frequent Front-end FUX-Ups
+# Frequent Front-End FUX-Ups
 
 Little issues frequently caught during code reviews, for easy and quick future reference and resolution.
 
