@@ -251,6 +251,24 @@ should be named `my_excellent_module.js`
 
 
 
+## Single line CSS Properties
+
+You may be tempted to write a single CSS property / value declaration all in one line, like so:
+
+```SCSS
+.wl-property { font-weight: bold; }
+```
+
+but this opens room for more merge conflicts. Since all of our SCSS is compiled onto one line, we can avoid the potentiality of more conflicts by breaking this out to read:
+
+```SCSS
+.wl-property {
+  font-weight: bold;
+}
+```
+
+
+
 ## Style Guide
 
 You must add a new section to the style guide each time:
