@@ -340,6 +340,22 @@ You must double check the style guide for accuracy to make sure the description 
 
 
 
+## Using line-height as an Alignment Hack
+
+Arguably, anytime you're increasing the `line-height` on an element to a value greater-than one-and-a-half times it's natural height, you're probably trying to do something like vertically align the text inside it's container.
+
+This isn't always the case of course, but a good rule of thumb is to rethink what you're doing if you start to drastically increase an element's `line-height`.
+
+An example where this is commonly seen is inside forms. Most front-end developers want their labels to align, vertically, with their associated input fields when the label/input combinations are supposed to be presented in rows. Let's say the input is 30px tall. If you match the `line-height` of your label to be 30px as well, it looks great... until that label becomes long enough to wrap. Then you have a very, very confusing looking form on your hands.
+
+A better way to handle this is by making both the label and the input field `display: inline-block` with a `vertical-align: middle` and a reasonable `line-height` applied to the label. This, however, opens the question of "what to do about rows that contain textareas". If having a label middle-aligned with a large input element, like a textarea, then I'd specifically code for that type of condition, or, instead of the aforementioned solution, add at least a top padding to each of your labels, so that each label associated with a text box or select element _appears_ vertically centered, until you get to the text-area.
+
+Luckily there are many components in the WebLinc platform that help with form handling, most notable in this case is [wl-property--row](http://demo.weblinc.com/style_guide#wl-property--row).
+
+Just try to rethink what you're doing if you catch yourself considering using `line-height` for some purpose other than strictly for the height between lines of text.
+
+
+
 # Front-End Rails Knowledge Base for Engines
 
 More information on important base concepts.
