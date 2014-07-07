@@ -161,6 +161,7 @@ if, in this example, the product does not have sharing enabled, and:
 if it does.
 
 
+
 ## Color Variables: Descriptive vs. Functional
 
 When adding a new color to be used across the site, we add it to the top of `_vars.css.scss`, inside the _Descriptive Names_ section, like so:
@@ -206,6 +207,85 @@ Then, your actual `page_layout.css.scss` file, where the styling should take pla
 ```
 
 With this pattern we infrequently add new Descriptive Name variables and very frequently add Functional Name variables, allowing us to make massive color changes to the site by only ever editing one file, the `_vars.css.scss` file.
+
+
+
+## Components in CSS
+
+### Structure
+Each and every component and modifier should be grouped and referenced in triplicate inside the `components.css.scss` file. One of the references is a mixin for including, one is a placeholder selector for extending, and one is a class selector for direct class reference. Here is an example of `wl-button` and `wl-button--small`:
+
+```SCSS
+// ===============================================
+// wl-button (for @include)
+// ===============================================
+
+@mixin wl-button {
+  @include transition(background, 0.2s, ease);
+  display: inline-block;
+  margin: 0;
+  padding: 11px 20px;
+  text-align: center;
+  line-height: 1;
+  font-size: 22px;
+  font-family: $tertiary-font;
+  font-weight: normal;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: $button-color;
+  background: $button-bg-color;
+  border: 0;
+  cursor: pointer;
+  white-space: nowrap;
+  &:hover {
+    color: $button-color;
+    text-decoration: none;
+    background: $button-hover-bg-color;
+  }
+}
+
+// ===============================================
+// wl-button (for @extend)
+// ===============================================
+
+%wl-button {
+  @include wl-button;
+}
+
+// ===============================================
+// wl-button (class selector)
+// ===============================================
+
+.wl-button {
+  @extend %wl-button;
+}
+
+// ===============================================
+// wl-button--small (for @include)
+// ===============================================
+
+@mixin wl-button--small {
+  @include wl-button;
+  padding: 7px 10px;
+  font-size: 16px;
+}
+
+// ===============================================
+// wl-button--small (for @extend)
+// ===============================================
+
+%wl-button--small {
+  @include wl-button--small;
+}
+
+// ===============================================
+// wl-button--small (class selector)
+// ===============================================
+
+.wl-button--small {
+  @extend %wl-button--small;
+}
+```
 
 
 
