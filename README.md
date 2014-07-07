@@ -212,6 +212,82 @@ With this pattern we infrequently add new Descriptive Name variables and very fr
 
 ## Components in CSS
 
+### When to scope view styles to a component
+If you have a piece of code that requires styling and is referenced across multiple views, or between a layout and a view, this is usually a good indicator that a component is needed.
+
+An exception to this rule is with entire view style blocks. The best example is `.wl-category-browse-view` vs `.wl-search-results-view`. These are both views, and their styling is specific to the contents of the view, but each of these pages base styles are almost identical.
+
+Combining these styles in a chain, like so:
+
+```SCSS
+// ===============================================
+// wl-category-browse-view and wl-search-results-view shared styles
+// ===============================================
+
+.wl-category-browse-view, .wl-search-results-view  {
+
+  h1 {
+    @extend %visually-hidden;
+  }
+
+  // top controls
+  .wl-browsing-controls--top {
+    padding: 0 0 10px;
+    border-bottom: 1px solid $border-color;
+  }
+
+  // bottom controls
+  .wl-browsing-controls--bottom {
+    padding: 10px 0 0;
+    border-top: 1px solid $border-color;
+  }
+
+  ...
+
+}
+```
+
+is problematic because, if in the future new functionality specific to one of these views is introduced, neither of these views are unique. You'd have to re-separate out these views to make unique changes to one or the other, or you'll keep this block and just add another block underneath it that has specific styles only for the one view and not the other.
+
+A better solution would be as follows, keeping in mind this solution is for views that are strikingly similar, such as the views in the example:
+
+```SCSS
+// ===============================================
+// wl-category-browse-view
+// ===============================================
+
+.wl-category-browse-view {
+
+  h1 {
+    @extend %visually-hidden;
+  }
+
+  // top controls
+  .wl-browsing-controls--top {
+    padding: 0 0 10px;
+    border-bottom: 1px solid $border-color;
+  }
+
+  // bottom controls
+  .wl-browsing-controls--bottom {
+    padding: 10px 0 0;
+    border-top: 1px solid $border-color;
+  }
+
+  ...
+
+}
+
+// ===============================================
+// wl-search-results-view
+// ===============================================
+
+.wl-search-results-view {
+  @extend .wl-category-browse-view;
+}
+```
+
+
 ### Structure
 Each and every component and modifier should be grouped and referenced in triplicate inside the `components.css.scss` file. One of the references is a mixin for including, one is a placeholder selector for extending, and one is a class selector for direct class reference. Here is an example of `wl-button` and `wl-button--small`:
 
