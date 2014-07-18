@@ -3,7 +3,20 @@ Issues caught during code reviews and more information on relevant concepts. Thi
 
 
 ## JavaScript
-Coming Soon
+
+### Variable naming
+Variables that hold jQuery collections should be prefixed with a dollar sign ('$') to allow future developers to know that they're able to use the jQuery API against any of those variable. Regular variables, and even an array of individual jQuery collections, would not have this prefix:
+
+```JavaScript
+var $detailsContainer = $('.wl-product-details', $scope),
+    myArray = [],
+    instance = {
+        $scope: $scope,
+        $detailsContainer: $detailsContainer,
+        $body: $('body', $scope),
+        bodyData: $('body', $scope).data()
+    };
+```
 
 
 ## Markup
