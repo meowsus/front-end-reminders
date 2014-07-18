@@ -18,6 +18,9 @@ WEBLINC.myModuleName = (function () { // scoped globally, see below
             if (_.isEmpty($dependency)) { return; }
 
             data = $dependency.data(); // still local to init function
+
+            ...
+            
         }
 
     WEBLINC.modules.onDomReady(init); // references globally scoped object
