@@ -4,7 +4,35 @@ Issues caught during code reviews and more information on relevant concepts. Thi
 
 ## JavaScript
 
-### Variable hoisting and scope
+### Binding and Triggering Events in jQuery
+Rather than using jQuery's shortcut methods for binding and triggering events, we use the `$.on()` and `$.trigger()` methods instead. This is for many reasons, but the most prominent is that __on__ binds to any selector, even if it doesn't exist yet, and both of these methods explicitly explain what you're trying to accomplish. 
+
+You're either binding an event __on__ an element or __trigger__ing an event on an element. 
+
+For example:
+
+```JavaScript
+var $myAnchor = $('.my-anchor', $scope);
+
+// instead of 
+$myAnchor.click(function (e) {
+    e.preventDefault();
+
+    window.alert('Clicked!')
+});
+
+// use
+$myAnchor.on('click', function (e) {
+    e.preventDefault();
+
+    window.alert('Clicked!');
+});
+
+// and to trigger later, use
+$myAnchor.trigger('click');
+```
+
+### Variable Hoisting and Scope
 Always define and even predefine your variables at the top of your module's functions. This helps lessen confusion and helps reduce sporadically inserted variables as you need them through your code. Furthermore, always using a `var` statement defines scope and keeps variables from floating around in scope they shouldn't be in. For example:
 
 ```JavaScript
@@ -20,7 +48,7 @@ WEBLINC.myModuleName = (function () { // scoped globally, see below
             data = $dependency.data(); // still local to init function
 
             ...
-            
+
         }
 
     WEBLINC.modules.onDomReady(init); // references globally scoped object
@@ -31,7 +59,7 @@ WEBLINC.myModuleName = (function () { // scoped globally, see below
 }());
 ```
 
-### Variable naming
+### Variable Naming
 Variables that hold jQuery collections should be prefixed with a dollar sign ('$') to allow future developers to know that they're able to use the jQuery API against any of those variable. Regular variables, and even an array of individual jQuery collections, would not have this prefix:
 
 ```JavaScript
