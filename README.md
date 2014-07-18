@@ -4,6 +4,30 @@ Issues caught during code reviews and more information on relevant concepts. Thi
 
 ## JavaScript
 
+### Variable hoisting and scope
+Always define and even predefine your variables at the top of your module's functions. This helps lessen confusion and helps reduce sporadically inserted variables as you need them through your code. Furthermore, always using a `var` statement defines scope and keeps variables from floating around in scope they shouldn't be in. For example:
+
+```JavaScript
+WEBLINC.myModuleName = (function () { // scoped globally, see below
+    'use strict';
+
+    var init = function ($scope) { // scoped to WEBLINC.myModuleName
+            var $dependency = $('.element', $scope), // local to init function
+                data; // sets localized variable 'placeholder'
+
+            if (_.isEmpty($dependency)) { return; }
+
+            data = $dependency.data(); // still local to init function
+        }
+
+    WEBLINC.modules.onDomReady(init); // references globally scoped object
+
+    return {
+        init: init
+    };
+}());
+```
+
 ### Variable naming
 Variables that hold jQuery collections should be prefixed with a dollar sign ('$') to allow future developers to know that they're able to use the jQuery API against any of those variable. Regular variables, and even an array of individual jQuery collections, would not have this prefix:
 
