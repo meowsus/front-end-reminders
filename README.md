@@ -167,6 +167,25 @@ in certain cases.
   - [HAML Documentation](http://haml.info/docs.html)
 
 
+### Readability
+
+When working with ActionView Helpers we should be spacing curly brakets accordingly:
+
+```HAML
+.my-element{ data: { attribute_name: 'attribute value' } }
+  ...
+```
+
+Which is compiled to:
+
+```HTML
+<div class="my-element" data-attribute-name="attribute value">
+    ...
+</div>
+```
+
+
+
 ## Stylesheets
 
 ### Adjacent Selectors
