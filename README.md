@@ -169,7 +169,7 @@ in certain cases.
 
 ### Readability
 
-When working with ActionView Helpers we should be spacing curly brakets accordingly:
+When working with ActionView Helpers we should be spacing curly braces accordingly:
 
 ```HAML
 .my-element{ data: { attribute_name: 'attribute value' } }
@@ -341,7 +341,7 @@ For example, here is an element's default state:
 }
 ```
 
-Chilren of this parent element also have default states, like so:
+Children of this parent element also have default states, like so:
 
 ```SCSS
 .wl-mobile-style-nav {
@@ -355,7 +355,7 @@ Chilren of this parent element also have default states, like so:
 }
 ```
 
-Next we want to define states. We want to (a) show everything only at the medium breakpoint, (b) put an underline under anchor tags when they're hovered, and (c) turn the achors red at the medium breakpoint:
+Next we want to define states. We want to (a) show everything only at the medium breakpoint, (b) put an underline under anchor tags when they're hovered, and (c) turn the anchors red at the medium breakpoint:
 
 ```SCSS
 // Good Example
@@ -689,7 +689,7 @@ A better solution would be as follows, keeping in mind this solution is for view
 }
 ```
 
-This way the base styles for `.wl-search-results-view` are inherited from `.wl-category-browse-view`, and can be easily added to for elements that are specifically different insie `.wl-search-results-view`.
+This way the base styles for `.wl-search-results-view` are inherited from `.wl-category-browse-view`, and can be easily added to elements that are specifically different inside `.wl-search-results-view`.
 
 
 #### Structure of a component
