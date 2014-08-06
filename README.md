@@ -327,6 +327,92 @@ but this opens room for more merge conflicts. Since all of our SCSS is eventuall
 If every block adheres to this rule, git is able to resolve many more conflicts by itself and better understand what developers are trying to do with each SCSS commit.
 
 
+## Styling "States" in SCSS
+
+We style elements all the time. When we start to style an element, you can think of it like you're styling an element's default state. Another obvious state of that element might be a `:hover` state. For a link, you'd style the `a` according to how it should look by default, then add a nested `&:hover {}` inside of the parent block to define it's hover state. 
+
+You can think of `@respond-to` in the same way.
+
+For example, here is an element's default state:
+
+```SCSS
+.wl-mobile-style-nav {
+  display: block;
+}
+```
+
+Chilren of this parent element also have default states, like so:
+
+```SCSS
+.wl-mobile-style-nav {
+  display: none;
+
+  a {
+    display: block;
+    padding: 12px 15px;
+    text-decoration: none;
+  }
+}
+```
+
+Next we want to define states. We want to (a) show everything only at the medium breakpoint, (b) put an underline under anchor tags when they're hovered, and (c) turn the achors red at the medium breakpoint:
+
+```SCSS
+// Good Example
+.wl-mobile-style-nav {
+  display: none;
+  @include respond-to($medium-breakpoint) {
+    display: block;
+  }
+
+  a {
+    display: block;
+    padding: 12px 15px;
+    text-decoration: none;
+    &:hover {
+      text-decoration: underline;
+    }
+    @include respond-to($medium-breakpoint) {
+      color: $medium-anchor-color; // #ff0000
+    }
+  }
+}
+```
+
+States should be defined so that they can be easily identified. This means that you want to avoid these two types of common anti-patterns:
+
+```SCSS
+// Bad Example
+.wl-mobile-style-nav {
+  display: none;
+
+  a {
+    display: block;
+    padding: 12px 15px;
+    text-decoration: none;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  // having this state at the bottom of the block works, but it is unclear that
+  // we're acting on the code for the default state of .wl-mobile-style-nav.
+  // It should be moved up under the second line to be more clear.
+  @include respond-to($medium-breakpoint) {
+    display: block;
+    // just because we've opened a medium breakpoint block doesn't mean we
+    // should jam more elements inside of it than are necessary. We want to
+    // define a state WITHIN it's element.
+    a {
+      color: $medium-anchor-color;
+    }
+  }
+}
+```
+
+The 'Good Example' (above) is an good example of how the structure should be maintained, for reasons of code clarity.
+
+
 ## Using line-height as a Vertical Alignment Hack
 
 Arguably, anytime you're increasing the `line-height` on an element to a value greater-than one-and-a-half times it's natural height, you're probably trying to do something like vertically align the text inside it's container.
