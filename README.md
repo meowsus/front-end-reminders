@@ -7,7 +7,7 @@ Issues caught during code reviews and more information on relevant concepts. Thi
 ### Binding and Triggering Events in jQuery
 Rather than using jQuery's shortcut methods for binding and triggering events, we use the `$.on()` and `$.trigger()` methods instead. This is for many reasons, but the most prominent is that __on__ binds to any selector, even if it doesn't exist yet, and both of these methods explicitly explain what you're trying to accomplish. 
 
-You're either binding an event __on__ an element or __trigger__ing an event on an element. 
+You're either binding an event __on__ an element or you're trying to __trigger__ an event on an element. 
 
 For example:
 
@@ -303,6 +303,7 @@ form {
     padding: 10px; // overrides all directions
   }
 }
+```
 
 If, of course, you're overriding more than one value later in the block, it might make more sense to redefine each direction. That should be evaluated on a case by case basis.
 
