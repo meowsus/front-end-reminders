@@ -5,16 +5,16 @@ Issues caught during code reviews and more information on relevant concepts. Thi
 ## JavaScript
 
 ### Binding and Triggering Events in jQuery
-Rather than using jQuery's shortcut methods for binding and triggering events, we use the `$.on()` and `$.trigger()` methods instead. This is for many reasons, but the most prominent is that __on__ binds to any selector, even if it doesn't exist yet, and both of these methods explicitly explain what you're trying to accomplish. 
+Rather than using jQuery's shortcut methods for binding and triggering events, we use the `$.on()` and `$.trigger()` methods instead. This is for many reasons, but the most prominent is that __on__ binds to any selector, even if it doesn't exist yet, and both of these methods explicitly explain what you're trying to accomplish.
 
-You're either binding an event __on__ an element or you're trying to __trigger__ an event on an element. 
+You're either binding an event __on__ an element or you're trying to __trigger__ an event on an element.
 
 For example:
 
 ```JavaScript
 var $myAnchor = $('.my-anchor', $scope);
 
-// instead of 
+// instead of
 $myAnchor.click(function (e) {
     e.preventDefault();
 
@@ -263,6 +263,350 @@ A contrived example:
 ```
 
 
+### Decoupling Layout Styles from More Specific Element Styles
+
+This is a bit of an edge case, but consider the following pattern; used for styling a ton of grid-like sections on the Product Detail page.
+
+#### Markup
+
+```HAML
+
+...
+
+.wl-product-details
+  .grid
+    .grid-cell-1
+      .grid
+
+        / Product Name, Image, etc
+        .grid-cell-1
+          %h1.product-name{ itemprop: 'name' }= product.name
+          %p.id.label{ itemprop: 'productID' } Style # #{product.id}
+
+          %p.primary-image
+            = link_to(product_image_url(product.primary_image, :zoom), class: 'wl-open-dialog', target: '_blank') do
+              = image_tag(product_image_url(product.primary_image, :detail), alt: 'View Larger Image', itemprop: 'image')
+
+        / Price, Add To Bag, Etc
+        .grid-cell-2
+          - cache "#{product.cache_key}_detail_options", expires_in: 30.minutes do
+            - if product.promotional_discount_message.present?
+              %p.promo-message= product.promotional_discount_message
+            .prices{ itemprop: 'offers', itemscope: true, itemtype: 'http://schema.org/Offer' }
+              = render 'store_front/products/pricing', product: product
+
+          = form_tag store_front_cart_items_url, method: 'post', class: "product-form" do
+              = hidden_field_tag :product_id, product.id
+              - if product.sku_options.one?
+                = hidden_field_tag :sku, product.sku_options.first.last
+              - else
+                .sku.wl-property
+                  = label_tag :sku, nil, class: 'name' do
+                    %span.text Select options
+                  .wl-value= select_tag :sku, options_for_select(product.sku_options, params[:sku]), required: true
+              .quantity.wl-property
+                = label_tag :quantity, nil, class: "name" do
+                  %span.text Qty
+                .wl-value= select_tag :quantity, options_for_select(1..10, params[:quantity]), required: true
+              - if product.purchasable?
+                .wl-action= button_tag "Add to Cart", value: "add_to_cart", class: "add-to-cart wl-button--large wl-button"
+              - else
+                %p This product is currently unavailable for purchase.
+
+    / Description, Alternate Images, etc
+    .grid-cell-2
+      %p.product-name= product.name
+        %p.id.label{ itemprop: 'productID' } Style # #{product.id}
+        - if @product.content[:description].present?
+          .description
+            %p.label Description
+            .wl-content-area!= @product.content[:description]
+
+      - if product.images.length > 1
+          .alternate-images
+            %p.label Alternate Views
+            %ul.alternate-image-group
+              - product.images.each_with_index do |image, index|
+                %li.alternate-image
+                  - button_class = index == 0 ? 'alternate-image-button--is-selected alternate-image-button': 'alternate-image-button'
+                  = link_to image_tag(product_image_url(image, :small_thumb), alt: 'View Larger Image'), product_image_url(image, :detail), class: button_class, data: { zoom: product_image_url(image, :zoom) }
+
+...
+
+```
+
+Take a minute and digest that, looking at the comments to help out.
+
+The design calls for a very complex layout, specifically when considering mobile. The order of sections for mobile is very different than the placement of these sections for Desktop. This kind of markup, when styled, can allow for the design to be fulfilled.
+
+Now here's the styling:
+
+```SCSS
+.wl-product-details {
+
+  // grids
+  > .grid {
+    @extend %cf;
+    > .grid-cell-1 {
+      > .grid {
+        @include cf;
+        text-transform: uppercase;
+        > .grid-cell-1 {
+          padding-bottom: 18px;
+          border-bottom: 1px solid $section-divider-color;
+          @include respond-to($medium-breakpoint) {
+            width: 57%;
+            float: left;
+            border: none;
+            .label {
+              display: none;
+            }
+          }
+          @include respond-to($wide-breakpoint) {
+            width: 47%;
+          }
+          .product-name {
+            @include respond-to($medium-breakpoint) {
+              display: none;
+            }
+          }
+        }
+        > .grid-cell-2 {
+          font-size: px-to-em(9);
+          @include respond-to($medium-breakpoint) {
+            width: 37%;
+            float: right;
+          }
+          @include respond-to($wide-breakpoint) {
+            width: 47%;
+          }
+          .product-name {
+            display: none;
+            @include respond-to($medium-breakpoint) {
+              display: block;
+            }
+          }
+        }
+      }
+    }
+    > .grid-cell-2 {
+      @include respond-to($medium-breakpoint) {
+        width: 27.35%;
+        float: left;
+      }
+    }
+  }
+
+  .product-name {
+    display: block;
+    font-family: $secondary-font-stack;
+    font-size: px-to-em(18);
+    font-weight: normal;
+    text-transform: uppercase;
+  }
+
+  ...
+
+}
+```
+
+There are two problems in play here. First, considering the markup, our only selector hooks are grid-related. This says to me that the styling should contain a section that is for the grid layout only, but we can see in the styling markup that there are specific named styles peppered in with the layout styles.
+
+I'm a firm believe in each element carrying, at most, one type of selector. This means that you can have a selector and/or that selectors modifier, so that that specific selector is being styled in the CSS.
+
+I would first refactor the markup like so, giving each section encapsulated within the grid a named class:
+
+```HAML
+
+...
+
+.wl-product-details
+  .grid
+    .grid-cell-1
+      .grid
+
+        / Product Name, Image, etc
+        .product-information
+          .grid-cell-1
+            %h1.product-name{ itemprop: 'name' }= product.name
+            %p.id.label{ itemprop: 'productID' } Style # #{product.id}
+
+            %p.primary-image
+              = link_to(product_image_url(product.primary_image, :zoom), class: 'wl-open-dialog', target: '_blank') do
+                = image_tag(product_image_url(product.primary_image, :detail), alt: 'View Larger Image', itemprop: 'image')
+
+        / Price, Add To Bag, Etc
+        .grid-cell-2
+          - cache "#{product.cache_key}_detail_options", expires_in: 30.minutes do
+            .product-purchasing-options
+              - if product.promotional_discount_message.present?
+                %p.promo-message= product.promotional_discount_message
+              .prices{ itemprop: 'offers', itemscope: true, itemtype: 'http://schema.org/Offer' }
+                = render 'store_front/products/pricing', product: product
+
+            = form_tag store_front_cart_items_url, method: 'post', class: "product-form" do
+                = hidden_field_tag :product_id, product.id
+                - if product.sku_options.one?
+                  = hidden_field_tag :sku, product.sku_options.first.last
+                - else
+                  .sku.wl-property
+                    = label_tag :sku, nil, class: 'name' do
+                      %span.text Select options
+                    .wl-value= select_tag :sku, options_for_select(product.sku_options, params[:sku]), required: true
+                .quantity.wl-property
+                  = label_tag :quantity, nil, class: "name" do
+                    %span.text Qty
+                  .wl-value= select_tag :quantity, options_for_select(1..10, params[:quantity]), required: true
+                - if product.purchasable?
+                  .wl-action= button_tag "Add to Cart", value: "add_to_cart", class: "add-to-cart wl-button--large wl-button"
+                - else
+                  %p This product is currently unavailable for purchase.
+
+    / Description, Alternate Images, etc
+    .grid-cell-2
+      .product-description
+        %p.product-name= product.name
+          %p.id.label{ itemprop: 'productID' } Style # #{product.id}
+          - if @product.content[:description].present?
+            .description
+              %p.label Description
+              .wl-content-area!= @product.content[:description]
+
+      - if product.images.length > 1
+        .product-alt-images
+          .alternate-images
+            %p.label Alternate Views
+            %ul.alternate-image-group
+              - product.images.each_with_index do |image, index|
+                %li.alternate-image
+                  - button_class = index == 0 ? 'alternate-image-button--is-selected alternate-image-button': 'alternate-image-button'
+                  = link_to image_tag(product_image_url(image, :small_thumb), alt: 'View Larger Image'), product_image_url(image, :detail), class: button_class, data: { zoom: product_image_url(image, :zoom) }
+
+...
+
+```
+
+All I did there was wrapped each chunk of DOM inside a named selector.
+
+Now I have division between each section of the product detail page and the grid-related classes that define the layout.
+
+Next I'd refactor the styles in three ways:
+1. Cut down on nesting by chaining child selectors,
+2. Add comments to diminish confusion introduced by the aforementioned chaining, and
+3. Break styling related to each section out of the layout logic
+
+Like so:
+
+```SCSS
+.wl-product-details {
+
+  // GRID LAYOUT
+
+  // All Grid Containers
+  .grid {
+    @extend %cf;
+  }
+
+  // Parent Grid Container
+  > .grid {}
+
+  // Product Image & Purchasing Cell
+  > .grid > .grid-cell-1 {
+    @include respond-to($medium-breakpoint) {
+      width: 72.65%;
+      float: right;
+    }
+  }
+
+  // Product Image & Purchaing Cell Container
+  > .grid > .grid-cell-1 > .grid {}
+
+  // Product Information
+  > .grid > .grid-cell-1 > .grid > .grid-cell-1 {
+    @include respond-to($medium-breakpoint) {
+      width: 57%;
+      float: left;
+    }
+    @include respond-to($wide-breakpoint) {
+      width: 47%;
+    }
+  }
+
+  // Product Purchasing Options
+  > .grid > .grid-cell-1 > .grid > .grid-cell-2 {
+    @include respond-to($medium-breakpoint) {
+      width: 37%;
+      float: right;
+    }
+    @include respond-to($wide-breakpoint) {
+      width: 47%;
+    }
+  }
+
+  // Product Description & Alt Images
+  > .grid > .grid-cell-2 {
+    @include respond-to($medium-breakpoint) {
+      width: 27.35%;
+      float: left;
+    }
+  }
+
+
+  // SECTION STYLING
+
+  // Product Name
+  .product-name {
+    display: block;
+    font-family: $secondary-font-stack;
+    font-size: px-to-em(18);
+    font-weight: normal;
+    text-transform: uppercase;
+  }
+
+  // Product Information Section
+  .product-information {
+    padding-bottom: 18px;
+    text-decoration: uppercase;
+    border-bottom: 1px solid $section-divider-color;
+    @include respond-to($medium-breakpoint) {
+      border: none;
+    }
+
+    .label {
+      @include respond-to($medium-breakpoint) {
+        display: none;
+      }
+    }
+
+    .product-name {
+      @include respond-to($medium-breakpoint) {
+        display: none;
+      }
+    }
+  }
+
+  // Product Purchasing Options Section
+  .product-purchasing-options {
+    font-size: px-to-em(9);
+    text-decoration: uppercase;
+
+    .product-name {
+      display: none;
+      @include respond-to($medium-breakpoint) {
+        display: block;
+      }
+    }
+  }
+
+  ...
+
+}
+```
+
+This will decouple the layout styling from the sectional styling fairly easily, keeping each set of styles in their respective scope. The child selector pattern is really only preferred when you have deeply nested, repetitive markup, much like the Primary Navigation. It also creates purposeful, empty declarations to help show the tree a bit better.
+
+
+
 ### Margin and Padding
 
 The first time margin and/or padding is applied, it should be defined for all four directions. This sounds vague, but since we style elements or components in multiple locations, it is a bit vague.
@@ -330,7 +674,7 @@ If every block adheres to this rule, git is able to resolve many more conflicts 
 
 ## Styling "States" in SCSS
 
-We style elements all the time. When we start to style an element, you can think of it like you're styling an element's default state. Another obvious state of that element might be a `:hover` state. For a link, you'd style the `a` according to how it should look by default, then add a nested `&:hover {}` inside of the parent block to define it's hover state. 
+We style elements all the time. When we start to style an element, you can think of it like you're styling an element's default state. Another obvious state of that element might be a `:hover` state. For a link, you'd style the `a` according to how it should look by default, then add a nested `&:hover {}` inside of the parent block to define it's hover state.
 
 You can think of `@respond-to` in the same way.
 
