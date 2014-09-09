@@ -267,7 +267,7 @@ A contrived example:
 
 This is a bit of an edge case, but consider the following pattern; used for styling a ton of grid-like sections on the Product Detail page.
 
-#### Markup
+#### Markup - Original
 
 ```HAML
 
@@ -340,6 +340,8 @@ Take a minute and digest that, looking at the comments to help out.
 The design calls for a very complex layout, specifically when considering mobile. The order of sections for mobile is very different than the placement of these sections for Desktop. This kind of markup, when styled, can allow for the design to be fulfilled.
 
 Now here's the styling:
+
+#### CSS - Original
 
 ```SCSS
 .wl-product-details {
@@ -415,6 +417,8 @@ There are two problems in play here. First, considering the markup, our only sel
 I'm a firm believe in each element carrying, at most, one type of selector. This means that you can have a selector and/or that selectors modifier, so that that specific selector is being styled in the CSS.
 
 I would first refactor the markup like so, giving each section encapsulated within the grid a named class:
+
+#### Markup - Refactor
 
 ```HAML
 
@@ -496,6 +500,8 @@ Next I'd refactor the styles in three ways:
 3. Break styling related to each section out of the layout logic
 
 Like so:
+
+#### CSS - Refactor
 
 ```SCSS
 .wl-product-details {
